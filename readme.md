@@ -18,11 +18,13 @@
 1. Get all the userDocs
 
 command: 
+
 curl -X GET \
   http://localhost:8080/flower-service/userDocs \
   -H 'content-type: application/json' 
   
  Result:
+ 
  [
     {
         "id": 1,
@@ -52,12 +54,15 @@ curl -X GET \
     ] 
     
 2. get a single userDoc by id
+
  command: 
+ 
  curl -X GET \
   http://localhost:8080/flower-service/userDocs/4 \
   -H 'content-type: application/json' \
   
   result:
+  
   {
     "id": 4,
     "userId": 1,
@@ -71,16 +76,21 @@ curl -X GET \
 }
 
 3. get count of unique userId
+
 command:
+
 curl -X GET \
   http://localhost:8080/flower-service/userDocs/userCount \
   -H 'content-type: application/json' \
 
 result:
+
 10
 
 4. update title, body of userDoc 4 using put (Note all 4 fields are needed)
+
 command:
+
 curl -X PUT \
   http://localhost:8080/flower-service/userDocs/4 \
   -H 'accept: application/json' \
@@ -93,6 +103,7 @@ curl -X PUT \
 }'
 
 Result:
+
 {
     "id": 4,
     "userId": 1,
@@ -106,6 +117,9 @@ Result:
 }
 
 (5) update title, body of userDoc 4 using patch (only specify the fields need to be updated)
+
+command:
+
 curl -X PATCH \
   http://localhost:8080/flower-service/userDocs/4 \
   -H 'accept: application/json' \
@@ -116,6 +130,7 @@ curl -X PATCH \
 }'
 
 Results:
+
 {
     "id": 4,
     "userId": 1,
