@@ -2,6 +2,7 @@
     mvn clean install
    
 (2) After the application jar is created, it can be run locally, deployed to docker container and  kubernate
+
     1. run it in local machine:  start the application in target directory
          java -jar ./flower-service-0.0.1-SNAPSHOT.jar
  
@@ -10,7 +11,7 @@
 		   check image is created:  docker images
 		   run the image:           docker run -p 8080:8080 flowerservice
 		   
-	3. use deployment.yaml to deploy the docker image to minikube
+    3. use deployment.yaml to deploy the docker image to minikube
 	
 (3) access endpoints:
 
