@@ -12,6 +12,9 @@
 		   run the image:           docker run -p 8080:8080 flowerservice
 		   
     3. use deployment.yaml to deploy the docker image to minikube
+           kubectl apply -f deployment.yaml
+	   kubectl get deployment
+	 check the kube dashboard to check, one servcie and two deployments will be created
 	
 (3) access endpoints:
 
