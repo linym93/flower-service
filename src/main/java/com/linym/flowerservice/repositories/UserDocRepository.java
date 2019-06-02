@@ -3,6 +3,8 @@ package com.linym.flowerservice.repositories;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -16,9 +18,12 @@ import com.linym.flowerservice.models.UserDoc;
 @Repository
 public class UserDocRepository {
 	
+	static final  Logger logger=LoggerFactory.getLogger(UserDocRepository.class);
+	
 	private final String feedUrl;
 	RestTemplate restTemplate= new RestTemplate();
 	private List<UserDoc> userDocRepository;
+	
 	
 	@Autowired
 	public UserDocRepository(@Value("${feed.url:http://jsonplaceholder.typicode.com/posts}") String feedUrl) {
@@ -52,6 +57,7 @@ public class UserDocRepository {
 		userDocs=response.getBody();
 			
 		}catch(Exception e) {
+			logger.error("Cannot get feed from "+feedUrl +" Error:" + e.getMessage());
 			e.printStackTrace();
 		}
 		return userDocs;
