@@ -14,20 +14,20 @@
      spec:
        containers:
          - name: flowerservice
-           image: flowerservice
+           image: flowerservice:v1
            ports:
-             - containerPort: 88
+             - containerPort: 80
 ---
-kind: Service
 apiVersion: v1
+kind: Service
 metadata:
   name: flowerservice-service
-  spec:
-    selector:
-      app: flowerservice
-    ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 31000
-    type: NodePort
+spec:
+  selector:
+    app: flowerservice
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 31000
+  type: NodePort
 

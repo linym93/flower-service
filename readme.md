@@ -7,14 +7,24 @@
          java -jar ./flower-service-0.0.1-SNAPSHOT.jar
  
     2. run it in docker container: from root directory where Dockerfile locates, use docker command to create and run image
-		   create image:            docker build -t flowerservice .
-		   check image is created:  docker images
-		   run the image:           docker run -p 8080:8080 flowerservice
+		   create image:            
+		           docker build -t flowerservice:v1 .
+		   check image is created:  
+		           docker images
+		   run the image:           
+		            docker run -p 8080:8080 flowerservice
+		   
+		   list all docker containers:  
+		            docker ps -al
+		   stop&remove a docker container: 
+		            docker rm -f CONTAINER_ID
+		   remove docker image : 
+		            docker rmi Image ImageID
 		   
     3. use deployment.yaml to deploy the docker image to minikube
-           kubectl apply -f deployment.yaml
-	   kubectl get deployment
-	 check the kube dashboard to check, one servcie and two deployments will be created
+         kubectl apply -f deployment.yaml
+	     kubectl get deployment
+	     run minikube dashboard  to check, one service and two pods will be created for the deployment
 	
 (3) access endpoints:
 
