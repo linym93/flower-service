@@ -22,7 +22,7 @@
 		            docker rmi Image ImageID
 		   
     3. use deployment.yaml to deploy the docker image to minikube
-         kubectl apply -f deployment.yaml
+         kubectl create -f deployment.yaml
 	     kubectl get deployment
 	     run minikube dashboard  to check, one service and two pods will be created for the deployment
 	
@@ -65,6 +65,20 @@ curl -X GET \
     },
     ...
     ] 
+    
+  command:
+    curl -X GET 'http://localhost:8080/flower-service/userDocs?orderby=title' 
+  Results:  list of userDocs sort by title
+  
+  command:
+    curl -X GET 'http://localhost:8080/flower-service/userDocs?userId=1'
+  Results:  list of userDocs with userId=1
+  
+  command:
+    curl -X GET 'http://localhost:8080/flower-service/userDocs?userId=1&orderby=title' 
+  Results:  list of userDocs with userId=1 sort by title
+  
+  
     
 2. get a single userDoc by id
 
