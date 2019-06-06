@@ -85,7 +85,7 @@ class UserDocControllerTest {
 	void testGetUserDocs() {
 		when(userDocService.getUserDocRepository()).thenReturn(mockUserDocRepository);
 		when(entityLinks.linkToSingleResource(any(Class.class), anyLong())).thenReturn(mockLink);
-		ResponseEntity<List<Resource<UserDoc>>> responseEntity = userDocController.getUserDocs();
+		ResponseEntity<List<Resource<UserDoc>>> responseEntity = userDocController.getUserDocs(any(),any());
 		assertEquals(HttpStatus.OK,responseEntity.getStatusCode());
 		assertEquals(10,responseEntity.getBody().size());
 	}

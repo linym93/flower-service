@@ -1,8 +1,10 @@
 package com.linym.flowerservice.controllers;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityLinks;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.linym.flowerservice.models.UserDoc;
@@ -32,14 +35,27 @@ public class UserDocController {
 	private EntityLinks entityLinks;
 	
 	@GetMapping
-	public ResponseEntity<List<Resource<UserDoc>>> getUserDocs(){
+	public ResponseEntity<List<Resource<UserDoc>>> getUserDocs(
+			@RequestParam(required = false) String orderby,
+			@RequestParam(required=false) Integer userId){
+		
 		List<UserDoc> userDocs=userDocService.getUserDocRepository();
-		List<Resource<UserDoc>> userDocsResources=new ArrayList<>();
+		if(userId != null) {
+			userDocs=userDocService.getUserDocsByUserId(userId);
+		}
+		if("title".equals(orderby)) {
+			userDocs.sort((userDoc1,userDoc2)->userDoc1.getTitle().compareTo(userDoc2.getTitle()));
+		}
+		List<Resource<UserDoc>> userDocsResources=new ArrayList<>(); 
+		 
 		for(UserDoc userDoc:userDocs) {
 			Resource<UserDoc> resource= new Resource<UserDoc>(userDoc);
 			resource.add(entityLinks.linkToSingleResource(UserDoc.class, userDoc.getId()));
 			userDocsResources.add(resource);
 		}
+		
+		
+      
 		return new ResponseEntity<List<Resource<UserDoc>>>(userDocsResources,HttpStatus.OK);
 
 	}
@@ -75,5 +91,6 @@ public class UserDocController {
 		resource.add(entityLinks.linkToSingleResource(newUserDoc));
 		return new ResponseEntity<Resource<UserDoc>>(resource,HttpStatus.OK);
 	}
+
 
 }
