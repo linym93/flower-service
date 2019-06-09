@@ -35,15 +35,68 @@
          start dashboard  to check, one deploand two pods will be created for the deployment:
             minikube dashboard
            
-	     
 (3) access endpoints:
 
 1. Get all the userDocs
 
 curl -X GET http://localhost:8080/flower-service/userDocs -H 'content-type: application/json' 
   
+
 2. get userDocs orderby title:
   url -X GET http://localhost:8080/flower-service/userDocs?orderby=title -H 'content-type: application/json' 
+
+ Result:
+ 
+ [
+    {
+        "id": 1,
+        "userId": 1,
+        "title": "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
+        "body": "quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto",
+        "links": [
+            {
+                "rel": "self",
+                "href": "http://localhost:8080/flower-service/userDocs/1"
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "userId": 1,
+        "title": "qui est esse",
+        "body": "est rerum tempore vitae\nsequi sint nihil reprehenderit dolor beatae ea dolores neque\nfugiat blanditiis voluptate porro vel nihil molestiae ut reiciendis\nqui aperiam non debitis possimus qui neque nisi nulla",
+        "links": [
+            {
+                "rel": "self",
+                "href": "http://localhost:8080/flower_service/userDocs/2"
+            }
+        ]
+    },
+    ...
+    ] 
+    
+  command:
+    curl -X GET 'http://localhost:8080/flower-service/userDocs?orderby=title' 
+  Results:  list of userDocs sort by title
+  
+  command:
+    curl -X GET 'http://localhost:8080/flower-service/userDocs?userId=1'
+  Results:  list of userDocs with userId=1
+  
+  command:
+    curl -X GET 'http://localhost:8080/flower-service/userDocs?userId=1&orderby=title' 
+  Results:  list of userDocs with userId=1 sort by title
+  
+  
+    
+2. get a single userDoc by id
+
+ command: 
+ 
+ curl -X GET \
+  http://localhost:8080/flower-service/userDocs/4 \
+  -H 'content-type: application/json' \
+>>>>>>> f9fed737c4a5c12859a1c5eafe0562c2ac3ac723
   
 3. get userDocs with specify userId
   url -X GET http://localhost:8080/flower-service/userDocs?userID=1 -H 'content-type: application/json' 
