@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.linym.flowerservice.exceptions.UserDocNotFoundException;
 import com.linym.flowerservice.models.UserDoc;
 import com.linym.flowerservice.repositories.UserDocRepository;
 
@@ -29,14 +30,16 @@ public class UserDocService {
 	}
 	
 	
-	public UserDoc getUserDocByID(long id) {
+	public UserDoc getUserDocByID(long id) throws UserDocNotFoundException {
 		for(UserDoc userDoc:userDocRepository.getUserDocRepository()) {
 			if(userDoc.getId()==id) {
 				return userDoc;
 			}
 		}
-		logger.warn("cannot find userDoc with id="+id);
-		return null;
+		
+		String msg="cannot find userDoc with id="+id;
+		logger.warn(msg);
+		throw new UserDocNotFoundException(msg);
 		
 	}
 	
@@ -45,7 +48,7 @@ public class UserDocService {
 		return userDocRepository.getUserDocRepository().stream().filter(distinctByKey(UserDoc::getUserId)).count();
 	}
 	
-	public UserDoc updateWholeUserDocById(Long id, UserDoc userDoc) {
+	public UserDoc updateWholeUserDocById(Long id, UserDoc userDoc) throws UserDocNotFoundException{
 		List<UserDoc> repository = userDocRepository.getUserDocRepository();
 		for(int i=0; i<repository.size();i++) {
 			if(repository.get(i).getId()==id) {
@@ -55,11 +58,12 @@ public class UserDocService {
 				return userDoc;
 			}
 		}
-		logger.warn("cannot update whole userDocs with id="+id);
-		return null;
+		String msg="cannot update whole userDoc with id="+id;
+		logger.warn(msg);
+		throw new UserDocNotFoundException(msg);
 	}
 
-	public UserDoc updatePartialUserDocById(Long id, Map<String,Object> fields) {
+	public UserDoc updatePartialUserDocById(Long id, Map<String,Object> fields) throws UserDocNotFoundException {
 		List<UserDoc> repository = userDocRepository.getUserDocRepository();
 		for(int i=0; i<repository.size();i++) {
 			if(repository.get(i).getId()==id) {
@@ -73,14 +77,45 @@ public class UserDocService {
 				return userDoc;
 				}
 			}
-		logger.warn("cannot update partial userDoc with id="+id);
-		return null;
-	
+		String msg="cannot update partial userDoc with id="+id;
+		logger.warn(msg);
+		throw new UserDocNotFoundException(msg);
 	}
 	
 	public List<UserDoc> getUserDocsByUserId(int userId){
 		
 		return userDocRepository.getUserDocRepository().stream().filter(userDoc->userDoc.getUserId()==userId).collect(Collectors.toList());
+	}
+	
+	public UserDoc createUserDoc(Map<String,Object> fields) {
+		UserDoc userDoc=new UserDoc();
+		Long newId = userDocRepository.getUserDocRepository().stream()
+				     .max((userDoc1,userDoc2)->userDoc1.getId()
+				     .compareTo(userDoc2.getId()))
+				     .get().getId()+1;
+		userDoc.setId(newId);
+		if(fields.containsKey("title")) {userDoc.setTitle(fields.get("title").toString());}
+		if(fields.containsKey("body")) {userDoc.setBody(fields.get("body").toString());}
+		if(fields.containsKey("userId")) {userDoc.setUserId(Integer.parseInt(fields.get("userId").toString()));}
+		return userDoc;
+	}
+	
+	public void deleteUserDoc(Long id) throws UserDocNotFoundException {
+		boolean deleted=false;
+		List<UserDoc> userDocs = userDocRepository.getUserDocRepository();
+		for(int i=0; i<userDocs.size(); i++) {
+			if(userDocs.get(i).getId()==id) {
+				userDocs.remove(i);
+				deleted=true;
+				break;
+			}
+		}
+		if(!deleted){
+			String msg="cannot delete userDoc with id="+id;
+			logger.warn(msg);
+			throw new UserDocNotFoundException(msg);
+		}
+		
 	}
 
     private  static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor)

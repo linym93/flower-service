@@ -9,12 +9,14 @@ import java.util.Map;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,8 +27,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.ArgumentMatchers.*;
 
+import com.linym.flowerservice.exceptions.UserDocNotFoundException;
 import com.linym.flowerservice.models.UserDoc;
 import com.linym.flowerservice.services.UserDocService;
 
@@ -85,7 +89,7 @@ class UserDocControllerTest {
 	void testGetUserDocs() {
 		when(userDocService.getUserDocRepository()).thenReturn(mockUserDocRepository);
 		when(entityLinks.linkToSingleResource(any(Class.class), anyLong())).thenReturn(mockLink);
-		ResponseEntity<List<Resource<UserDoc>>> responseEntity = userDocController.getUserDocs(any(),any());
+		ResponseEntity<List<Resource<UserDoc>>> responseEntity = userDocController.getUserDocs(null, null);
 		assertEquals(HttpStatus.OK,responseEntity.getStatusCode());
 		assertEquals(10,responseEntity.getBody().size());
 	}
@@ -102,7 +106,8 @@ class UserDocControllerTest {
     
 	@DisplayName("Test UserDocController getUserDocById")
 	@Test
-	void testGetUserDocById() {
+	void testGetUserDocById() throws UserDocNotFoundException {
+		
 		when(userDocService.getUserDocByID(1L)).thenReturn(mockUserDoc);
 		when(entityLinks.linkToSingleResource(any())).thenReturn(mockLink);
 		ResponseEntity<Resource<UserDoc>> responseEntity = userDocController.getUserDocById(1L);
@@ -113,7 +118,7 @@ class UserDocControllerTest {
 
 	@DisplayName("Test UserDocController partialUpdateUserDoc")
 	@Test
-	void testPartialUpdateUserDoc() {
+	void testPartialUpdateUserDoc() throws UserDocNotFoundException {
 		
 		Map<String,Object> updateFields=new HashMap<>();
 		updateFields.put("title", "updatedTitle");
@@ -132,7 +137,7 @@ class UserDocControllerTest {
 	
     @DisplayName("Test UserDocController updateUserDoc")
 	@Test
-	void testUpdateUserDoc() {
+	void testUpdateUserDoc() throws UserDocNotFoundException {
         UserDoc updatedUserDoc=new UserDoc(1L,1,"updatedTitle","updatedBody");
 		
 		when(userDocService.updateWholeUserDocById(1L, updatedUserDoc)).thenReturn(updatedUserDoc);
@@ -143,5 +148,31 @@ class UserDocControllerTest {
 		assertEquals(updatedUserDoc,responseEntity.getBody().getContent());
 		assertEquals(mockLink,responseEntity.getBody().getId());
 	}
+    
+    @DisplayName("Test UserDocController createUserDoc")
+   	@Test
+   	void testCreateUserDoc() {
+        UserDoc newUserDoc=new UserDoc(11L,6,"newTitle","newdBody eleven");
+        Map<String,Object> newFields=new HashMap<>();
+   		newFields.put("title", "newTitle");
+   		newFields.put("body", "newBody eleven");
+   		
+   		when(userDocService.createUserDoc(newFields)).thenReturn(newUserDoc);
+   		when(entityLinks.linkToSingleResource(any())).thenReturn(mockLink);
+   		
+   		ResponseEntity<Resource<UserDoc>> responseEntity = userDocController.createNewUserDoc(newFields);
+   		assertEquals(HttpStatus.OK,responseEntity.getStatusCode());
+   		assertEquals(newUserDoc,responseEntity.getBody().getContent());
+   		assertEquals(mockLink,responseEntity.getBody().getId());
+   	}
+    
+    @DisplayName("Test UserDocController deleteUserDoc")
+   	@Test
+   	void testDeleteUserDoc() throws UserDocNotFoundException {
+    	doThrow(new UserDocNotFoundException()).when(userDocService).deleteUserDoc(anyLong());
+    	Assertions.assertThrows(UserDocNotFoundException.class, () -> userDocController.deleteUserDoc(12L));
+   
+    }
+    
 
 }

@@ -7,8 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,10 +18,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.mockito.Mockito.when;
 
+import com.linym.flowerservice.exceptions.UserDocNotFoundException;
 import com.linym.flowerservice.models.UserDoc;
 import com.linym.flowerservice.repositories.UserDocRepository;
 
 @SpringBootTest
+//@TestMethodOrder(OrderAnnotation.class)
 class UserDocServiceTest {
 	
 	@Mock
@@ -72,7 +73,7 @@ class UserDocServiceTest {
 
     @DisplayName("Test UserDocService getUserDocByID")
 	@Test
-	void testGetUserDocByID() {
+	void testGetUserDocByID() throws UserDocNotFoundException {
     	assertEquals(expectedUserDoc,userDocService.getUserDocByID(1L));
 		
 	}
@@ -85,14 +86,14 @@ class UserDocServiceTest {
 
     @DisplayName("Test UserDocService updateWholeUserDocById")
 	@Test
-	void testUpdateWholeUserDocById() {
+	void testUpdateWholeUserDocById() throws UserDocNotFoundException {
 		UserDoc updatedUserDoc = new UserDoc(4L,2,"updatedFullTitle","updatedFullBody four");
 		assertEquals(updatedUserDoc,userDocService.updateWholeUserDocById(4L, updatedUserDoc));
 	}
 
     @DisplayName("Test UserDocService updatePartialUserDocById")
 	@Test
-	void testUpdatePartialUserDocById() {
+	void testUpdatePartialUserDocById() throws UserDocNotFoundException {
 		Map<String,Object> updatedFields = new HashMap<>();
 		updatedFields.put("title", "updatedPartialTitle");
 		updatedFields.put("body", "updatedPartialBody four");
@@ -105,5 +106,23 @@ class UserDocServiceTest {
 	void testGetUserDocsByUserId() {
 		assertEquals(2,userDocService.getUserDocsByUserId(1).size());
 	}
+    
+    @DisplayName("Test UserDocService createUserDoc")
+   	@Test
+   	void testCreateUserDoc() {
+    	Map<String,Object> newDocFields = new HashMap<>();
+		newDocFields.put("title", "NewTitle");
+		newDocFields.put("body", "New Body eleven");
+		newDocFields.put("userId", 6);
+		UserDoc expectedUserDoc=new UserDoc(11L,6,"NewTitle","New Body eleven");
+   		assertEquals(expectedUserDoc,userDocService.createUserDoc(newDocFields));
+   	}
+    
+    @DisplayName("Test UserDocService deleteDocsByUserId userDocNotFoundException")
+   	@Test
+   	void testDeleteUserDocsByUserId() {
+    	 Assertions.assertThrows(UserDocNotFoundException.class,() -> userDocService.deleteUserDoc(11L));
+    
+   	}
 
 }

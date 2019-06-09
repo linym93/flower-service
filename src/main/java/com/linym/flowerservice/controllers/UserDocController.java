@@ -1,27 +1,27 @@
 package com.linym.flowerservice.controllers;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityLinks;
 import org.springframework.hateoas.ExposesResourceFor;
 import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.linym.flowerservice.exceptions.UserDocNotFoundException;
 import com.linym.flowerservice.models.UserDoc;
 import com.linym.flowerservice.services.UserDocService;
 
@@ -53,8 +53,6 @@ public class UserDocController {
 			resource.add(entityLinks.linkToSingleResource(UserDoc.class, userDoc.getId()));
 			userDocsResources.add(resource);
 		}
-		
-		
       
 		return new ResponseEntity<List<Resource<UserDoc>>>(userDocsResources,HttpStatus.OK);
 
@@ -69,7 +67,7 @@ public class UserDocController {
 	
 
 	@GetMapping("{id}")
-	public ResponseEntity<Resource<UserDoc>> getUserDocById(@PathVariable long id){
+	public ResponseEntity<Resource<UserDoc>> getUserDocById(@PathVariable long id) throws UserDocNotFoundException{
 		UserDoc userDoc=userDocService.getUserDocByID(id);
 		Resource<UserDoc> resource= new Resource<UserDoc>(userDoc);
 		resource.add(entityLinks.linkToSingleResource(userDoc));
@@ -77,20 +75,33 @@ public class UserDocController {
 	}
 	
 	@PatchMapping("{id}")
-	public ResponseEntity<Resource<UserDoc>> partialUpdateUserDoc(@PathVariable long id, @RequestBody Map<String,Object> fields){
+	public ResponseEntity<Resource<UserDoc>> partialUpdateUserDoc(@PathVariable long id, @RequestBody Map<String,Object> fields) throws UserDocNotFoundException{
 		UserDoc newUserDoc=userDocService.updatePartialUserDocById(id, fields);
 		Resource<UserDoc> resource= new Resource<UserDoc>(newUserDoc);
 		resource.add(entityLinks.linkToSingleResource(newUserDoc));
 		return new ResponseEntity<Resource<UserDoc>>(resource,HttpStatus.OK);
 	}
-    
+	
 	@PutMapping("{id}")
-	public ResponseEntity<Resource<UserDoc>> updateUserDoc(@PathVariable long id, @RequestBody UserDoc userDoc){
-		UserDoc newUserDoc=userDocService.updateWholeUserDocById(id, userDoc);
+	 public ResponseEntity<Resource<UserDoc>> updateUserDoc(@PathVariable long id, @RequestBody UserDoc userDoc) throws UserDocNotFoundException{
+	     UserDoc newUserDoc=userDocService.updateWholeUserDocById(id, userDoc);
+	     Resource<UserDoc> resource= new Resource<UserDoc>(newUserDoc);
+		 resource.add(entityLinks.linkToSingleResource(newUserDoc));
+		 return new ResponseEntity<Resource<UserDoc>>(resource,HttpStatus.OK);
+	}
+    
+	@PostMapping()
+	public ResponseEntity<Resource<UserDoc>> createNewUserDoc(@RequestBody Map<String,Object> fields){
+		UserDoc newUserDoc=userDocService.createUserDoc(fields);
 		Resource<UserDoc> resource= new Resource<UserDoc>(newUserDoc);
 		resource.add(entityLinks.linkToSingleResource(newUserDoc));
 		return new ResponseEntity<Resource<UserDoc>>(resource,HttpStatus.OK);
 	}
-
+	
+	@DeleteMapping("{id}")
+	public ResponseEntity<Object> deleteUserDoc(@PathVariable long id) throws UserDocNotFoundException{
+		userDocService.deleteUserDoc(id);
+		return new ResponseEntity<Object>(HttpStatus.OK);
+	}
 
 }
